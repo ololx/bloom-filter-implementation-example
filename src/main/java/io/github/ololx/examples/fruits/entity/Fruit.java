@@ -1,4 +1,4 @@
-package io.github.ololx.examples.bloomfilterimplementationexample.entity;
+package io.github.ololx.examples.fruits.entity;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;

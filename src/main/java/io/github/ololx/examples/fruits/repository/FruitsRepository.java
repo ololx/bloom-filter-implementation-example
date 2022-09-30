@@ -1,8 +1,10 @@
-package io.github.ololx.examples.bloomfilterimplementationexample.repository;
+package io.github.ololx.examples.fruits.repository;
 
-import io.github.ololx.examples.bloomfilterimplementationexample.entity.Fruit;
+import io.github.ololx.examples.fruits.entity.Fruit;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
 
 /**
  * project bloom-filter-implementation-example
@@ -10,8 +12,8 @@ import org.springframework.stereotype.Repository;
  *
  * @author Alexander A. Kropotin
  */
-@Repository("FruitsJpaRepository")
+@Repository("FruitsRepository")
 public interface FruitsRepository extends JpaRepository<Fruit, Integer> {
 
-
+    Optional<Fruit> findFirstByName(String name);
 }
