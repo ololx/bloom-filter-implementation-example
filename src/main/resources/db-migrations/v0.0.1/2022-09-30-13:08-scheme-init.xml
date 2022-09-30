@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+
+    <changeSet
+            id="2022-09-30-13:08-scheme-init"
+            author="ololx@icloud.com"
+            logicalFilePath="2022-09-30-13:08-scheme-init.xml"
+    >
+
+        <createTable tableName="fruits">
+            <column name="id" type="SERIAL">
+                <constraints primaryKey="true" primaryKeyName="fruits_pkey"/>
+            </column>
+            <column name="name" type="VARCHAR">
+                <constraints nullable="false" unique="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

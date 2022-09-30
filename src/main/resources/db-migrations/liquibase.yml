@@ -1,0 +1,5 @@
+liquibase:
+  changeLogFile: src/main/resources/db-migrations/changelog.xml
+  url: jdbc:postgresql://localhost:5432/fruits_db
+  username: fruits_db_user
+  password: fruits_db_password

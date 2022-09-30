@@ -1,0 +1,35 @@
+version: '3'
+
+services:
+  fruits-dbms:
+    container_name: fruits-dbms
+    user: root
+    restart: always
+    image: postgres:10.6
+    environment:
+      - POSTGRES_USER=bloom
+      - POSTGRES_PASSWORD=qwerty
+      - POSTGRES_DB=fruits_db
+    ports:
+      - "5432:5432"
+    logging:
+      driver: json-file
+      options:
+        tag: "{{.ImageName}}|{{.Name}}|{{.ImageFullID}}|{{.FullID}}"
+
+  fruits-api:
+    container_name: fruits-api
+    user: root
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    logging:
+      driver: json-file
+      options:
+        tag: "{{.ImageName}}|{{.Name}}|{{.ImageFullID}}|{{.FullID}}"
+    depends_on:
+      - fruits-dbms
+

@@ -1,0 +1,44 @@
+logging:
+  file:
+    max-size: 2MB
+    path: ./logs
+
+  appender:
+    loki-sender:
+      host: loki
+      port: 3100
+
+server:
+  port: 8081
+
+spring:
+  application:
+    name: fruits-api
+
+  output:
+    ansi:
+      enabled: ALWAYS
+
+  datasource:
+    url: jdbc:postgresql://fruits-dbms:5432/fruits_db
+    username: bloom
+    password: qwerty
+
+  jpa:
+    properties:
+      hibernate:
+        temp:
+          use_jdbc_metadata_defaults: false
+        dialect: org.hibernate.dialect.PostgreSQL95Dialect
+        current_session_context_class: org.springframework.orm.hibernate5.SpringSessionContext
+      show-sql: true
+
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    show-sql: true
+
+  liquibase:
+    change-log: classpath:db-migrations/changelog.xml
+    enabled: true
+    drop-first: true
