@@ -19,8 +19,8 @@ import javax.persistence.*;
 @FieldDefaults(
         level = AccessLevel.PRIVATE
 )
-@Entity(name = "SomeData")
-@Table(name = "some_data")
+@Entity(name = "Fruit")
+@Table(name = "fruits")
 public class Fruit {
 
     @Id
