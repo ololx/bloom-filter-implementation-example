@@ -1,25 +1,18 @@
 package io.github.ololx.examples.fruits.service;
 
 import io.github.ololx.examples.fruits.entity.Fruit;
-import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Alexander A. Kropotin
@@ -36,7 +29,10 @@ import static org.junit.jupiter.api.Assertions.*;
 class SimpleFruitsServiceTest {
 
     @Autowired
-    SimpleFruitsService service;
+    SimpleFruitsService simpleFruitsService;
+
+    @Autowired
+    FilteredFruitsService filteredFruitsService;
 
     @BeforeEach
     void setUp() {
@@ -47,12 +43,29 @@ class SimpleFruitsServiceTest {
                             .name(String.valueOf(number))
                             .build();
                 })
-                .forEach(fruit -> service.create(fruit));
+                .forEach(fruit -> filteredFruitsService.create(fruit));
     }
 
     @Test
     void create() {
-        final var startTime = System.nanoTime();
+        long simpleTime = 0;
+        long filteredTime = 0;
+
+        for (var invocationNumber = 0; invocationNumber < 10; invocationNumber++) {
+            simpleTime += evaluateExecutionTime(this.simpleFruitsService);
+            filteredTime += evaluateExecutionTime(this.filteredFruitsService);
+        }
+
+        log.info(
+                "\nSimpleService AVG time = {}\nFilteredService AVG time = {}\nFilteredService faster in times = {}",
+                simpleTime / 10,
+                filteredTime / 10,
+                (simpleTime / 10) / (filteredTime / 10)
+        );
+    }
+
+    long evaluateExecutionTime(FruitsService<Fruit> service) {
+        long startTime = System.nanoTime();
         IntStream.range(0, 500)
                 .mapToObj(number -> {
                     return Fruit.builder()
@@ -64,7 +77,8 @@ class SimpleFruitsServiceTest {
                     final var created = service.create(fruit);
                     log.debug("Fruit {} was {} created", fruit, !created ? "not" : "");
                 });
-        final var endTime = System.nanoTime();
-        log.warn("Spend {} nanosec", endTime - startTime);
+        long endTime = System.nanoTime();
+
+        return endTime - startTime;
     }
 }

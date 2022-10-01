@@ -37,4 +37,22 @@ public class Fruit {
             nullable = false
     )
     String name;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Fruit fruit = (Fruit) o;
+
+        if (!id.equals(fruit.id)) return false;
+        return name.equals(fruit.name);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id.hashCode();
+        result = 31 * result + name.hashCode();
+        return result;
+    }
 }
