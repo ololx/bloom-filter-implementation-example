@@ -12,6 +12,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.List;
 import java.util.stream.IntStream;
 
 /**
@@ -36,14 +37,11 @@ class SimpleFruitsServiceTest {
 
     @BeforeEach
     void setUp() {
-        IntStream.range(0, 500)
-                .mapToObj(number -> {
-                    return Fruit.builder()
-                            .id(number)
-                            .name(String.valueOf(number))
-                            .build();
-                })
-                .forEach(fruit -> filteredFruitsService.create(fruit));
+        providesFruitsNames().stream()
+                .map(name -> Fruit.builder().name(String.valueOf(name)).build())
+                .forEach(fruit -> {
+                    filteredFruitsService.create(fruit);
+                });
     }
 
     @Test
@@ -66,19 +64,101 @@ class SimpleFruitsServiceTest {
 
     long evaluateExecutionTime(FruitsService<Fruit> service) {
         long startTime = System.nanoTime();
-        IntStream.range(0, 500)
-                .mapToObj(number -> {
-                    return Fruit.builder()
-                            .id(number)
-                            .name(String.valueOf(number))
-                            .build();
-                })
-                .forEach(fruit -> {
-                    final var created = service.create(fruit);
-                    log.debug("Fruit {} was {} created", fruit, !created ? "not" : "");
-                });
+        IntStream.range(0, 50).forEach(number -> {
+            providesFruitsNames().stream()
+                    .map(name -> Fruit.builder().name(String.valueOf(name)).build())
+                    .forEach(fruit -> {
+                        final var created = service.create(fruit);
+                        log.debug("Fruit {} was {} created", fruit, !created ? "not" : "");
+                    });
+        });
         long endTime = System.nanoTime();
 
         return endTime - startTime;
+    }
+
+    List<String> providesFruitsNames() {
+        return List.of(
+                "Apple", 
+                "Banana", 
+                "Apricot", 
+                "Atemoya", 
+                "Avocados", 
+                "Blueberry", 
+                "Blackcurrant", 
+                "Ackee", 
+                "Cranberry", 
+                "Cantaloupe", 
+                "Cherry", 
+                "Black sapote/Chocolate pudding fruit", 
+                "Dragonrfruit", 
+                "Dates", 
+                "Cherimoya", 
+                "Buddha’s hand fruit", 
+                "Finger Lime", 
+                "Fig", 
+                "Coconut", 
+                "Cape gooseberry/Inca berry/Physalis", 
+                "Grapefruit", 
+                "Gooseberries", 
+                "Custard apple/Sugar apple/Sweetsop", 
+                "Chempedak", 
+                "Hazelnut", 
+                "Honeyberries", 
+                "Dragon fruit", 
+                "Durian", 
+                "Horned Melon", 
+                "Hog Plum", 
+                "Egg fruit", 
+                "Feijoa/Pineapple guava/Guavasteen", 
+                "Indian Fig", 
+                "Ice Apple", 
+                "Guava", 
+                "Fuyu Persimmon", 
+                "Jackfruit", 
+                "Jujube", 
+                "Honeydew melon", 
+                "Jenipapo", 
+                "Kiwi", 
+                "Kabosu", 
+                "Kiwano", 
+                "Kaffir lime/Makrut Lime", 
+                "Lime", 
+                "Lychee", 
+                "Longan", 
+                "Langsat", 
+                "Mango", 
+                "Mulberry", 
+                "Pear", 
+                "Lucuma", 
+                "Muskmelon", 
+                "Naranjilla", 
+                "Passion fruit", 
+                "Mangosteen", 
+                "Nectarine", 
+                "Nance", 
+                "Quince", 
+                "Medlar fruit", 
+                "Olive", 
+                "Oranges", 
+                "Ramphal", 
+                "Mouse melon", 
+                "Papaya", 
+                "Peach", 
+                "Rose apple/Water apple", 
+                "Noni fruit", 
+                "Pomegranate", 
+                "Pineapple", 
+                "Rambutan", 
+                "Snake fruit/Salak", 
+                "Raspberries", 
+                "Strawberries", 
+                "Starfruit/Carambola", 
+                "Soursop", 
+                "Tangerine", 
+                "Watermelon", 
+                "Sapota", 
+                "Star apple"
+        );
     }
 }

@@ -22,14 +22,14 @@ public interface BloomFilter<T> {
         private final int[] seeds;
 
         private final BiFunction<String, Integer, Integer> hashFunction = (value, seed) -> {
-            return seed * value.hashCode();
+            return Integer.MAX_VALUE & (seed * value.hashCode());
         };
 
         public SimpleBloomFilter(int maxSize, int maxProbability) {
-            int m = (int) ((maxSize * (Math.log(maxProbability) * 2.30258)) / Math.pow(Math.log(2) * 2.30258, 2));
+            int m = (int) ((maxSize * (Math.log(maxProbability) * 2.30258)) / Math.pow(Math.log(2), 2));
             this.bitSet = new int[m];
 
-            int k = (int) ((m / maxSize) * Math.log(2) * 2.30258);
+            int k = (int) ((m / maxSize) * Math.log(2));
             this.seeds = IntStream.range(0, k).toArray();
         }
 
@@ -43,7 +43,7 @@ public interface BloomFilter<T> {
         @Override
         public boolean contains(String value) {
             for (var seed : seeds) {
-                if (this.bitSet[this.hashFunction.apply(value, seed) % this.bitSet.length] != 1) {
+                if (this.bitSet[this.hashFunction.apply(value, seed) % this.bitSet.length] != 0x1) {
                     return false;
                 }
             }

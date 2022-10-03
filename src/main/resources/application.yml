@@ -36,9 +36,9 @@ spring:
     hibernate:
       ddl-auto: validate
     open-in-view: false
-    show-sql: true
+    show-sql: false
 
   liquibase:
     change-log: classpath:db-migrations/changelog.xml
-    enabled: false
-    drop-first: false
+    enabled: true
+    drop-first: true
