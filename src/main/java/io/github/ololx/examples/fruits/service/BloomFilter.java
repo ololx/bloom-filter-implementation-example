@@ -26,7 +26,7 @@ public interface BloomFilter<T> {
         };
 
         public SimpleBloomFilter(int maxSize, int maxProbability) {
-            int m = (int) ((maxSize * (Math.log(maxProbability) * 2.30258)) / Math.pow(Math.log(2), 2));
+            int m = (int) ((maxSize * (Math.log(maxProbability))) / Math.pow(Math.log(2), 2));
             this.bitSet = new int[m];
 
             int k = (int) ((m / maxSize) * Math.log(2));
