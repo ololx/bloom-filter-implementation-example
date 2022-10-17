@@ -23,7 +23,7 @@ public class FilteredFruitsService implements FruitsService<Fruit> {
 
     FruitsRepository repository;
 
-    public static BloomFilter<String> filter = new BloomFilter.SimpleBloomFilter(200, 2);
+    public static BloomFilter<String> filter = new BloomFilter.SimpleBloomFilter(200, 100);
 
     @Override
     public boolean create(Fruit entity) {

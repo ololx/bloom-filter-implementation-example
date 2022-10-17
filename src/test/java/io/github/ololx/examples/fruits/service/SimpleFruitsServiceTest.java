@@ -17,9 +17,8 @@ import java.util.stream.IntStream;
 
 /**
  * @author Alexander A. Kropotin
- * @project bloom-filter-implementation-example
- * @created 30.09.2022 22:23
- * <p>
+ * project bloom-filter-implementation-example
+ * created 30.09.2022 22:23
  */
 @ActiveProfiles("test")
 @RunWith(SpringRunner.class)

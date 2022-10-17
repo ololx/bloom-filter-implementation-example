@@ -26,10 +26,10 @@ public interface BloomFilter<T> {
         };
 
         public SimpleBloomFilter(int maxSize, int maxProbability) {
-            int m = (int) ((maxSize * (Math.log(maxProbability))) / Math.pow(Math.log(2), 2));
+            int m = (int) Math.ceil(((maxSize * (Math.log(maxProbability))) / Math.pow(Math.log(2), 2)));
             this.bitSet = new int[m];
 
-            int k = (int) ((m / maxSize) * Math.log(2));
+            int k = (int) Math.ceil((m / maxSize) * Math.log(2));
             this.seeds = IntStream.range(0, k).toArray();
         }
 
