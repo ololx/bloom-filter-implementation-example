@@ -14,7 +14,6 @@ import javax.persistence.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
 @Data
 @FieldDefaults(
         level = AccessLevel.PRIVATE

@@ -3,6 +3,8 @@ package io.github.ololx.examples.fruits.service;
 import io.github.ololx.examples.fruits.entity.Fruit;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.ClassRule;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -11,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.util.List;
 import java.util.stream.IntStream;
@@ -28,11 +31,28 @@ import java.util.stream.IntStream;
 @NoArgsConstructor
 class SimpleFruitsServiceTest {
 
+    private static final String POSTGRES_IMAGE_NAME = "postgres:11.1";
+
+    @ClassRule
+    private static final PostgreSQLContainer<?> dbContainer = new PostgreSQLContainer<>(POSTGRES_IMAGE_NAME)
+            .withDatabaseName("fruits_db")
+            .withUsername("bloom")
+            .withPassword("qwerty");
+
     @Autowired
     SimpleFruitsService simpleFruitsService;
 
     @Autowired
     FilteredFruitsService filteredFruitsService;
+
+    @BeforeAll
+    static void init() {
+        dbContainer.start();
+
+        System.setProperty("DB_URL", dbContainer.getJdbcUrl());
+        System.setProperty("DB_USERNAME", dbContainer.getUsername());
+        System.setProperty("DB_PASSWORD", dbContainer.getPassword());
+    }
 
     @BeforeEach
     void setUp() {
