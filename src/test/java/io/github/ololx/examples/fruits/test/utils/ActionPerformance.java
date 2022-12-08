@@ -18,14 +18,12 @@ import java.lang.management.ManagementFactory;
 @Slf4j
 public final class ActionPerformance {
 
-    private final MBeanServerConnection mBeanServerConnection;
-
     private final OperatingSystemMXBean operatingSystemMXBean;
 
     private final ThreadMXBean threadMXBean;
 
     public ActionPerformance() throws IOException {
-        this.mBeanServerConnection = ManagementFactory.getPlatformMBeanServer();
+        MBeanServerConnection mBeanServerConnection = ManagementFactory.getPlatformMBeanServer();
         this.operatingSystemMXBean = ManagementFactory.newPlatformMXBeanProxy(
                 mBeanServerConnection, ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME, OperatingSystemMXBean.class
         );

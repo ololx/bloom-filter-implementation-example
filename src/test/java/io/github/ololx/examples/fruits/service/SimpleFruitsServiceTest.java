@@ -1,6 +1,7 @@
 package io.github.ololx.examples.fruits.service;
 
 import io.github.ololx.examples.fruits.entity.Fruit;
+import io.github.ololx.examples.fruits.test.utils.ActionPerformance;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.ClassRule;
@@ -15,6 +16,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.PostgreSQLContainer;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -34,10 +37,14 @@ class SimpleFruitsServiceTest {
     private static final String POSTGRES_IMAGE_NAME = "postgres:11.1";
 
     @ClassRule
-    private static final PostgreSQLContainer<?> dbContainer = new PostgreSQLContainer<>(POSTGRES_IMAGE_NAME)
+    public static final PostgreSQLContainer<?> dbContainer = new PostgreSQLContainer(POSTGRES_IMAGE_NAME)
             .withDatabaseName("fruits_db")
             .withUsername("bloom")
             .withPassword("qwerty");
+
+
+    @ClassRule
+    public static ActionPerformance actionPerformance;
 
     @Autowired
     SimpleFruitsService simpleFruitsService;
@@ -46,12 +53,14 @@ class SimpleFruitsServiceTest {
     FilteredFruitsService filteredFruitsService;
 
     @BeforeAll
-    static void init() {
+    static void init() throws IOException {
         dbContainer.start();
 
         System.setProperty("DB_URL", dbContainer.getJdbcUrl());
         System.setProperty("DB_USERNAME", dbContainer.getUsername());
         System.setProperty("DB_PASSWORD", dbContainer.getPassword());
+
+        actionPerformance = new ActionPerformance();
     }
 
     @BeforeEach
@@ -65,35 +74,51 @@ class SimpleFruitsServiceTest {
 
     @Test
     void create() {
-        long simpleTime = 0;
-        long filteredTime = 0;
+        List<ActionPerformance.Result> simpleServiceResults = new ArrayList<>();
+        List<ActionPerformance.Result> filteredServiceResults = new ArrayList<>();
 
         for (var invocationNumber = 0; invocationNumber < 10; invocationNumber++) {
-            simpleTime += evaluateExecutionTime(this.simpleFruitsService);
-            filteredTime += evaluateExecutionTime(this.filteredFruitsService);
+            simpleServiceResults.add(evaluateExecutionTime(this.simpleFruitsService));
+            filteredServiceResults.add(evaluateExecutionTime(this.filteredFruitsService));
         }
 
-        log.info(
-                "\nSimpleService AVG time = {}\nFilteredService AVG time = {}\nFilteredService faster in times = {}",
-                simpleTime / 10,
-                filteredTime / 10,
-                (simpleTime / 10) / (filteredTime / 10)
-        );
+        final String rowFormat = "| %-17s | %-10s | %-8s | %-12s |%n";
+        StringBuilder record = new StringBuilder();
+        record.append(String.format(
+                rowFormat,
+                "BLOOM - NOT BLOOM",
+                "TIME MS",
+                "CPU %",
+                "MEMORY KB"
+        ));
+
+        for (int resultIndex = 0; resultIndex < 10; resultIndex++) {
+            record.append(String.format(
+                    rowFormat,
+                    "BLOOM - NOT BLOOM",
+                    filteredServiceResults.get(resultIndex).runningTime / 1_000_000 + " - " + simpleServiceResults.get(resultIndex).runningTime / 1_000_000,
+                    filteredServiceResults.get(resultIndex).cpuLoad + " - " + simpleServiceResults.get(resultIndex).cpuLoad,
+                    filteredServiceResults.get(resultIndex).memoryUsage / 1024 + " - " + simpleServiceResults.get(resultIndex).memoryUsage / 1024
+            ));
+        }
+
+        log.info("\n{}", record.toString());
     }
 
-    long evaluateExecutionTime(FruitsService<Fruit> service) {
-        long startTime = System.nanoTime();
-        IntStream.range(0, 50).forEach(number -> {
-            providesFruitsNames().stream()
-                    .map(name -> Fruit.builder().name(String.valueOf(name)).build())
-                    .forEach(fruit -> {
-                        final var created = service.create(fruit);
-                        log.debug("Fruit {} was {} created", fruit, !created ? "not" : "");
+    ActionPerformance.Result evaluateExecutionTime(FruitsService<Fruit> service) {
+        return actionPerformance.evaluate(
+                () -> {
+                    IntStream.range(0, 50).forEach(number -> {
+                        providesFruitsNames().stream()
+                                .map(name -> Fruit.builder().name(String.valueOf(name)).build())
+                                .forEach(fruit -> {
+                                    final var created = service.create(fruit);
+                                    log.debug("Fruit {} was {} created", fruit, !created ? "not" : "");
+                                });
                     });
-        });
-        long endTime = System.nanoTime();
-
-        return endTime - startTime;
+                },
+                1000L //delay before evaluation in ms
+        );
     }
 
     List<String> providesFruitsNames() {
