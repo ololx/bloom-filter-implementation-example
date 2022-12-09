@@ -42,7 +42,7 @@ public interface BloomFilter<T> {
         @Override
         public void add(String value) {
             for (var seed : seeds) {
-                this.bitSet[this.hashFunction.apply(value, seed) % this.bitSet.length] = UNIT;
+                this.bitSet[this.hashFunction.apply(value, seed) % this.bitSet.length] |= UNIT;
             }
         }
 
@@ -59,8 +59,8 @@ public interface BloomFilter<T> {
 
         @Override
         public void clear() {
-            for (var bit : this.bitSet) {
-                this.bitSet[bit] = NIL;
+            for (var bit = 0; bit < this.bitSet.length; bit++) {
+                this.bitSet[bit] &= NIL;
             }
         }
     }

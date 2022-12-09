@@ -35,7 +35,7 @@ class FoodServiceTest {
 
     private static final String POSTGRES_IMAGE_NAME = "postgres:11.1";
 
-    private static final long TIMES = 1;
+    private static final long TIMES = 20;
 
     @ClassRule
     public static final PostgreSQLContainer<?> dbContainer = new PostgreSQLContainer<>(POSTGRES_IMAGE_NAME)
