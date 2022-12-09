@@ -1,7 +1,7 @@
 package io.github.ololx.examples.fruits.service;
 
-import io.github.ololx.examples.fruits.entity.Fruit;
-import io.github.ololx.examples.fruits.repository.FruitsRepository;
+import io.github.ololx.examples.fruits.entity.Food;
+import io.github.ololx.examples.fruits.repository.FoodRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -19,12 +19,12 @@ import org.springframework.stereotype.Service;
         makeFinal = true
 )
 @Service("SimpleFruitsService")
-public class SimpleFruitsService implements FruitsService<Fruit> {
+public class SimpleFruitsService implements FoodService<Food> {
 
-    FruitsRepository repository;
+    FoodRepository repository;
 
     @Override
-    public boolean create(Fruit entity) {
+    public boolean create(Food entity) {
         final var storedFruit = this.repository.findFirstByName(entity.getName());
 
         if (storedFruit.isPresent()) {
@@ -34,5 +34,10 @@ public class SimpleFruitsService implements FruitsService<Fruit> {
         this.repository.save(entity);
 
         return true;
+    }
+
+    @Override
+    public void deleteAll() {
+        this.repository.deleteAll();
     }
 }

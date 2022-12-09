@@ -11,9 +11,15 @@ import java.util.stream.IntStream;
  */
 public interface BloomFilter<T> {
 
+    int UNIT = 0b1;
+
+    int NIL = 0b0;
+
     void add(T value);
 
     boolean contains(T value);
+
+    void clear();
 
     public static class SimpleBloomFilter implements BloomFilter<String> {
 
@@ -36,19 +42,26 @@ public interface BloomFilter<T> {
         @Override
         public void add(String value) {
             for (var seed : seeds) {
-                this.bitSet[this.hashFunction.apply(value, seed) % this.bitSet.length] = 0x1;
+                this.bitSet[this.hashFunction.apply(value, seed) % this.bitSet.length] = UNIT;
             }
         }
 
         @Override
         public boolean contains(String value) {
             for (var seed : seeds) {
-                if (this.bitSet[this.hashFunction.apply(value, seed) % this.bitSet.length] != 0x1) {
+                if (this.bitSet[this.hashFunction.apply(value, seed) % this.bitSet.length] != UNIT) {
                     return false;
                 }
             }
 
             return true;
+        }
+
+        @Override
+        public void clear() {
+            for (var bit : this.bitSet) {
+                this.bitSet[bit] = NIL;
+            }
         }
     }
 }

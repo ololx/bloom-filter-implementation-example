@@ -10,9 +10,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @author Alexander A. Kropotin
  */
 @SpringBootApplication
-public class FruitsApplication {
+public class FoodApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(FruitsApplication.class, args);
+		SpringApplication.run(FoodApplication.class, args);
 	}
 }

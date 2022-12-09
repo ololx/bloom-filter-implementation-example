@@ -1,7 +1,7 @@
 package io.github.ololx.examples.fruits.service;
 
-import io.github.ololx.examples.fruits.entity.Fruit;
-import io.github.ololx.examples.fruits.repository.FruitsRepository;
+import io.github.ololx.examples.fruits.entity.Food;
+import io.github.ololx.examples.fruits.repository.FoodRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -19,27 +19,31 @@ import org.springframework.stereotype.Service;
         makeFinal = true
 )
 @Service("FilteredFruitsService")
-public class FilteredFruitsService implements FruitsService<Fruit> {
+public class FilteredFruitsService implements FoodService<Food> {
 
-    FruitsRepository repository;
+    FoodRepository repository;
 
-    public static BloomFilter<String> filter = new BloomFilter.SimpleBloomFilter(200, 100);
+    BloomFilter<String> filter = new BloomFilter.SimpleBloomFilter(3000, 100);
 
     @Override
-    public boolean create(Fruit entity) {
+    public boolean create(Food entity) {
         if (filter.contains(entity.getName())) {
-            return false;
-        }
+            final var storedFruit = this.repository.findFirstByName(entity.getName());
 
-        final var storedFruit = this.repository.findFirstByName(entity.getName());
-
-        if (storedFruit.isPresent()) {
-            return false;
+            if (storedFruit.isPresent()) {
+                return false;
+            }
         }
 
         this.repository.save(entity);
         filter.add(entity.getName());
 
         return true;
+    }
+
+    @Override
+    public void deleteAll() {
+        this.repository.deleteAll();
+        this.filter.clear();
     }
 }

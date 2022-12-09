@@ -8,6 +8,8 @@ import com.sun.management.ThreadMXBean;
 import javax.management.MBeanServerConnection;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.time.Clock;
+import java.time.Duration;
 
 /**
  * project bloom-filter-implementation-example
@@ -32,37 +34,41 @@ public final class ActionPerformance {
         );
     }
 
-    public Result evaluate(Runnable function) {
+    public Result evaluate(Action action) {
         long currentThreadId = Thread.currentThread().getId();
 
-        long nanoBefore = System.nanoTime();
         long cpuBefore = operatingSystemMXBean.getProcessCpuTime();
         long freeMemBefore = threadMXBean.getThreadAllocatedBytes(currentThreadId);
+        var nanoBefore = Clock.systemDefaultZone().instant();//System.nanoTime();
 
-        this.run(function);
+        this.execute(action);
 
+        var nanoAfter = Clock.systemDefaultZone().instant();//System.nanoTime();
         long cpuAfter = operatingSystemMXBean.getProcessCpuTime();
-        long nanoAfter = System.nanoTime();
         long freeMemAfter = threadMXBean.getThreadAllocatedBytes(currentThreadId);
 
+        var duration = Duration.between(nanoBefore, nanoAfter);
+
         return new Result(
-                nanoAfter > nanoBefore ? ((cpuAfter - cpuBefore) * 100L) / (nanoAfter - nanoBefore) : 0,
-                nanoAfter - nanoBefore,
+                nanoAfter.compareTo(nanoBefore) > 0
+                        ? ((cpuAfter - cpuBefore) * 100L) / (duration.toNanos())
+                        : Duration.ZERO.getNano(),
+                duration.toMillis(),
                 freeMemAfter - freeMemBefore
         );
     }
 
-    public Result evaluate(Runnable function, long delayInMillis) {
+    public Result evaluate(Action action, long delayInMillis) {
         this.await(delayInMillis);
 
-        return this.evaluate(function);
+        return this.evaluate(action);
     }
 
-    private boolean run(Runnable function) {
-        log.info("Run the function");
+    private boolean execute(Action action) {
+        //log.info("Run the function");
 
         try {
-            function.run();
+            action.execute();
         } catch (Exception e) {
             log.warn("Catch an exception when running the method:\n" + e.getMessage());
 
@@ -72,18 +78,21 @@ public final class ActionPerformance {
         return true;
     }
 
-    private boolean await(long millis) {
-        log.info("Wait " + millis + " ms before running");
+    private void await(long millis) {
+        //log.info("Wait " + millis + " ms before running");
 
         try {
             Thread.sleep(millis);
         } catch (InterruptedException e) {
             log.warn("Catch an exception when calling the sleep method:\n" + e.getMessage());
 
-            return false;
         }
 
-        return true;
+    }
+
+    public static interface Action {
+
+        void execute();
     }
 
     public static class Result {

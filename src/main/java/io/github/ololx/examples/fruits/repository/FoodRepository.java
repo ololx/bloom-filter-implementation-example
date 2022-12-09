@@ -1,6 +1,6 @@
 package io.github.ololx.examples.fruits.repository;
 
-import io.github.ololx.examples.fruits.entity.Fruit;
+import io.github.ololx.examples.fruits.entity.Food;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,7 +13,7 @@ import java.util.Optional;
  * @author Alexander A. Kropotin
  */
 @Repository("FruitsRepository")
-public interface FruitsRepository extends JpaRepository<Fruit, Integer> {
+public interface FoodRepository extends JpaRepository<Food, Integer> {
 
-    Optional<Fruit> findFirstByName(String name);
+    Optional<Food> findFirstByName(String name);
 }

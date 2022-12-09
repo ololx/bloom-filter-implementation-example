@@ -20,7 +20,7 @@ import javax.persistence.*;
 )
 @Entity(name = "Fruit")
 @Table(name = "fruits")
-public class Fruit {
+public class Food {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,16 +42,13 @@ public class Fruit {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Fruit fruit = (Fruit) o;
+        Food fruit = (Food) o;
 
-        if (!id.equals(fruit.id)) return false;
         return name.equals(fruit.name);
     }
 
     @Override
     public int hashCode() {
-        int result = id.hashCode();
-        result = 31 * result + name.hashCode();
-        return result;
+        return 31 + name.hashCode();
     }
 }
