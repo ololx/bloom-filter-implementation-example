@@ -72,20 +72,47 @@ class FoodServiceTest {
 
         for (var invocationNumber = 0; invocationNumber < TIMES; invocationNumber++) {
             this.filteredFruitsService.deleteAll();
-            filteredServiceResults.add(evaluateExecutionTime(this.filteredFruitsService, food));
+            filteredServiceResults.add(evaluateCreateExecutionTime(this.filteredFruitsService, food));
 
             this.simpleFruitsService.deleteAll();
-            simpleServiceResults.add(evaluateExecutionTime(this.simpleFruitsService, food));
+            simpleServiceResults.add(evaluateCreateExecutionTime(this.simpleFruitsService, food));
         }
 
         writeOutResult(simpleServiceResults, filteredServiceResults);
     }
 
-    ActionPerformance.Result evaluateExecutionTime(FoodService<Food> service, Collection<Food> food) {
+    @Test
+    void findByName_whenNoOneEntityExistsWithDefinedName_thenReturnNotFoundStatus() throws FileNotFoundException {
+        final var food = providesFoodEntities();
+        List<ActionPerformance.Result> simpleServiceResults = new ArrayList<>();
+        List<ActionPerformance.Result> filteredServiceResults = new ArrayList<>();
+
+        for (var invocationNumber = 0; invocationNumber < TIMES; invocationNumber++) {
+            this.filteredFruitsService.deleteAll();
+            filteredServiceResults.add(evaluateFindExecutionTime(this.filteredFruitsService, food));
+
+            this.simpleFruitsService.deleteAll();
+            simpleServiceResults.add(evaluateFindExecutionTime(this.simpleFruitsService, food));
+        }
+
+        writeOutResult(simpleServiceResults, filteredServiceResults);
+    }
+
+    ActionPerformance.Result evaluateCreateExecutionTime(FoodService<Food> service, Collection<Food> food) {
         return actionPerformance.evaluate(
                 () -> {
                     for (var eachFoodEntity : food) {
                         final var created = service.create(eachFoodEntity);
+                    }
+                }
+        );
+    }
+
+    ActionPerformance.Result evaluateFindExecutionTime(FoodService<Food> service, Collection<Food> food) {
+        return actionPerformance.evaluate(
+                () -> {
+                    for (var eachFoodEntity : food) {
+                        final var created = service.findByName(eachFoodEntity.getName());
                     }
                 }
         );

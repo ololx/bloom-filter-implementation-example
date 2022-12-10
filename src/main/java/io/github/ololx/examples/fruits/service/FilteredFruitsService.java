@@ -5,6 +5,8 @@ import io.github.ololx.examples.fruits.repository.FoodRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 /**
@@ -39,6 +41,20 @@ public class FilteredFruitsService implements FoodService<Food> {
         filter.add(entity.getName());
 
         return true;
+    }
+
+    @Override
+    public ResponseEntity<Food> findByName(String entityName) {
+        if (!filter.contains(entityName)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        final var storedFruit = this.repository.findFirstByName(entityName);
+        if (storedFruit.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(storedFruit.get());
     }
 
     @Override
